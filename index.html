@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم عيادة الجهاز</title>
+    <!-- ربط ملف التصميم -->
+    <link rel="stylesheet" href="style/style.css">
+    
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- المحتوى الرئيسي (على اليمين) -->
+        <main class="main-content">
+
+            <!-- 1. القائمة الرئيسية الجديدة -->
+            <div id="main-menu-tab" class="tab-content active">
+                <div class="patients-container"
+                    style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh;">
+                    <h1 style="color: #1e293b; font-size: 38px; margin-bottom: 50px; text-align: center;">العيادة الطبية
+                        بجهاز مدينة العبور</h1>
+
+                    <div style="display: flex; flex-direction: column; gap: 25px; width: 100%; max-width: 500px;">
+                        <button class="btn btn-primary" style="padding: 20px; font-size: 20px; border-radius: 12px;"
+                            onclick="switchTab('add-patient-tab')">
+                            اضافة مريض جديد ➕
+                        </button>
+                        <button class="btn btn-primary" style="padding: 20px; font-size: 20px; border-radius: 12px;"
+                            onclick="switchTab('search-patient-tab')">
+                            البحث عن مريض مسجل 🔍
+                        </button>
+                        <button class="btn btn-primary" style="padding: 20px; font-size: 20px; border-radius: 12px;"
+                            onclick="switchTab('statistics-tab')">
+                            الاحصائيات 📊
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 2. تبويب إضافة مريض جديد -->
+            <div id="add-patient-tab" class="tab-content">
+                <div class="patients-container">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #1e293b; font-size: 24px;">تسجيل مريض جديد</h2>
+                        <button class="btn btn-warning"
+                            onclick="switchTab('main-menu-tab', document.querySelector('.sidebar-menu li.main-link'))">🔙
+                            العودة للقائمة الرئيسية</button>
+                    </div>
+
+                    <div class="form-card">
+                        <h3 id="form-title" style="margin-bottom: 15px; color: #0284c7;">بيانات المريض</h3>
+                        <form id="patientForm">
+                            <input type="hidden" id="patientId">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label style="font-size: 20px;">اسم المريض الرباعي</label>
+                                    <input type="text" id="pName" class="form-input" required
+                                        placeholder="أدخل اسم المريض">
+                                </div>
+                                <div class="form-group">
+                                    <label style="font-size: 20px;">الرقم الطبي (الأساسي للبحث)</label>
+                                    <input type="text" id="pNationalId" class="form-input" required
+                                        placeholder=" الرقم الطبي ">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label style="font-size: 20px;">رقم البطاقة الشخصية / القومية</label>
+                                    <input type="text" id="pIdCard" class="form-input"
+                                        placeholder="أدخل رقم البطاقة الشخصية">
+                                </div>
+                                <div class="form-group">
+                                    <label style="font-size: 20px;">المنظومة / الجهة</label>
+                                    <input type="text" id="pSystem" class="form-input"
+                                        placeholder=" جهاز تنمية مدينة العبور" value="جهاز تنمية مدينة العبور">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label style="font-size: 20px;">اسم الطبيب</label>
+                                    <input type="text" id="pDoctorName" class="form-input" required
+                                        placeholder=" اسم الطبيب ">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pJob" style="font-size: 20px;">الدرجة المالية / الوظيفة</label>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <select id="pJob" class="form-input" style="flex: 1;">
+                                        </select>
+                                        <button type="button" class="btn btn-secondary" style="white-space: nowrap;"
+                                            onclick="toggleJobInput(true)">أضف وظيفة</button>
+                                    </div>
+                                    <div id="jobAddBlock"
+                                        style="display:none; margin-top: 12px; gap: 10px; align-items: center;">
+                                        <input type="text" id="newJobInput" class="form-input"
+                                            placeholder="أدخل الوظيفة الجديدة" style="flex: 1;">
+                                        <button type="button" class="btn btn-primary"
+                                            onclick="addJobOption()">حفظ</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            onclick="toggleJobInput(false)">إلغاء</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- حقل رفع الصورة ومعاينتها (التعديل الجديد) -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label style="font-size: 20px;">الصورة الشخصية للمريض (اختياري)</label>
+                                    <input type="file" id="pImage" class="form-input" accept="image/*"
+                                        onchange="previewImage(event)">
+                                    <input type="hidden" id="pImageBase64">
+                                </div>
+                                <div class="form-group" style="align-items: center; justify-content: center;">
+                                    <img id="imagePreview" src="" alt="معاينة الصورة"
+                                        style="display:none; width: 120px; height: 120px; border-radius: 8px; object-fit: cover; border: 2px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="saveBtn">حفظ وتسجيل المريض</button>
+                            <button type="button" class="btn" id="cancelEditBtn"
+                                style="display:none; background:#64748b; color:#fff;" onclick="resetForm()">إلغاء
+                                التعديل</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. تبويب البحث عن مريض مسجل -->
+            <div id="search-patient-tab" class="tab-content">
+                <div class="patients-container">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                        <h2 style="color: #1e293b; font-size: 24px;">سجل المرضى والبحث</h2>
+                        <div>
+                            <button type="button" id="togglePatientsViewBtn" class="btn btn-primary">👁️ إظهار القائمة</button>
+                            <button class="btn btn-warning"
+                                onclick="switchTab('main-menu-tab', document.querySelector('.sidebar-menu li.main-link'))">🔙
+                                العودة للقائمة الرئيسية</button>
+                        </div>
+                    </div>
+
+                    <div class="search-box-container">
+                        <input type="text" id="patientSearchInput" class="search-input"
+                            placeholder="ابحث بالاسم أو الرقم الطبي...">
+                    </div>
+
+                    <table class="patients-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الرقم الطبي</th>
+                                <th>اسم المريض</th>
+                                <th>المنظومة</th>
+                                <th>اسم الطبيب</th>
+                                <th>الدرجة المالية / الوظيفة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. تبويب الإحصائيات -->
+            <div id="statistics-tab" class="tab-content">
+                <div class="patients-container">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #1e293b; font-size: 24px;">الإحصائيات الخاصة بالمشروع</h2>
+                        <button class="btn btn-warning"
+                            onclick="switchTab('main-menu-tab', document.querySelector('.sidebar-menu li.main-link'))">🔙
+                            العودة للقائمة الرئيسية</button>
+                    </div>
+                    <div id="dashboard-stats"></div>
+                </div>
+            </div>
+
+            <!-- تبويب صفحة المريض الخاصة -->
+            <div id="patient-profile-tab" class="tab-content">
+                <div class="patient-profile-view">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 id="profileTitle" style="color: #1e293b;">الملف الشخصي للمريض</h2>
+                        <button class="btn btn-warning" onclick="switchTab('search-patient-tab')">🔙 العودة لقائمة
+                            البحث</button>
+                    </div>
+
+                    <!-- الحاوية التي سيتم حقن بيانات المريض وصورته بداخلها -->
+                    <div id="profileDetailsContent"
+                        style="font-size: 16px; line-height: 2; background: #f8fafc; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                    </div>
+
+                    <div
+                        style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                        <h3 style="margin-bottom: 15px; color: #0284c7;">سجل الروشتات الطبية المسجلة</h3>
+                        <div id="patientPrescriptionsHistory" style="margin-bottom: 15px;">
+                            <p style="color: #64748b;">لا توجد روشتات مسجلة لهذا المريض.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openRxForCurrentPatient()">إنشاء / إضافة روشتة جديدة
+                            لهذا المريض</button>
+                    </div>
+
+                    <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h3 style="margin-bottom: 15px; color: #0284c7;">سجل التحاليل والأشعة المرتبطة</h3>
+                        <div id="patientLabsHistory" style="margin-bottom: 15px;">
+                            <p style="color: #64748b;">لا توجد طلبات تحاليل مسجلة مسبقاً لهذا المريض.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openLabForCurrentPatient()">عمل طلب أشعة / تحاليل جديد
+                            لهذا المريض</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تبويب أورنيك العيادة (الروشتة) -->
+            <div id="prescription-tab" class="tab-content">
+                <div id="prescriptionPrintArea" class="paper-container" style="width: 100%;">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;" class="no-print">
+                        <button class="btn btn-warning" onclick="switchTab('patient-profile-tab')">🔙 العودة لصفحة
+                            المريض</button>
+                    </div>
+                    <div class="header">
+                        <div class="header-right">
+                            <p>وزارة الإسكان والمرافق والمجتمعات العمرانية</p>
+                            <p>هيئة المجتمعات العمرانية الجديدة</p>
+                            <p>جهاز تنمية مدينة العبور</p>
+                            <p>الرعاية الطبية</p>
+                        </div>
+                        <div class="header-center">
+                            <h1>أورنيـــك عيـــادة</h1>
+                        </div>
+                        <div class="header-left">
+                            رقم إيصال سداد الرسوم : <input type="text" class="dotted-input" style="width: 100px;">
+                        </div>
+                    </div>
+
+                    <!-- تفاصيل المريض -->
+                    <div class="patient-details">
+                        <div class="row no-print">
+                            <div style="flex: 1;">أدخل الرقم الطبي لجلب البيانات: <input type="text" id="rxCardSearch"
+                                    class="dotted-input" style="width: 50%; background: #eef7ff;"
+                                    oninput="fetchPatientByNationalId(this.value, 'rx')"></div>
+                        </div>
+                        <div class="row">
+                            <div style="flex: 1;">منظومة / <input type="text" id="rxSystem" class="dotted-input"
+                                    style="width: 85%;"></div>
+                        </div>
+                        <div class="row">
+                            <div style="flex: 1.5;">اسم المريض : <input type="text" id="rxName"
+                                    class="dotted-input patient-name-input" style="width: 75%;"></div>
+                            <div style="flex: 1;">الدرجة المالية : <input type="text" id="rxJob" class="dotted-input"
+                                    style="width: 60%;"></div>
+                        </div>
+                        <div class="row">
+                            <div style="flex: 1; display: flex; align-items: center; white-space: nowrap;">الادارة :
+                                <input type="text" class="dotted-input" style="width: 80%;">
+                            </div>
+                            <div style=" display: flex; align-items: center; ">تاريخ آخر إحالة للعلاج : <input
+                                    type="date" class="dotted-input"
+                                    style="width: 130px; flex: none; margin-right: 50px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="table-title">
+    بيان الأدوية اللازمة للعلاج
+    <button type="button" class="add-medicine-btn no-print" onclick="addCustomClinicMedicine()">＋ إضافة دواء</button>
+</div>
+
+                    <table class="clinic-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" width="3%">م</th>
+                                <th rowspan="2" class="col-desc">بيـــــــــــــــــــــــــــــــــان</th>
+                                <th rowspan="2" width="4%">عدد</th>
+                                <th colspan="2">محلى</th>
+                                <th colspan="2">مصنع ومستورد</th>
+                                <th colspan="2">الجملة</th>
+                                <th colspan="2">قيمة ربع ثمن الأدوية</th>
+                                <th colspan="2">قيمة ما يتحمله الجهاز</th>
+                            </tr>
+                            <tr class="sub-header">
+                                <th width="3.5%">قرش</th>
+                                <th width="3.5%">جنيه</th>
+                                <th width="3.5%">قرش</th>
+                                <th width="3.5%">جنيه</th>
+                                <th width="3.5%">قرش</th>
+                                <th width="3.5%">جنيه</th>
+                                <th width="3.5%">قرش</th>
+                                <th width="3.5%">جنيه</th>
+                                <th width="3.5%">قرش</th>
+                                <th width="3.5%">جنيه</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rxTableBody">
+                            <!-- سيتم توليد الصفوف عبر الجافاسكربت -->
+                        </tbody>
+                    </table>
+
+                    <datalist id="medicines-list"></datalist>
+
+                    <div class="footer-section">
+                        <div style="font-size: 14px;" class="footer-row">
+                            <div>تاريخ الزيارة : <input type="text" id="rxDate" class="dotted-input"
+                                    style="width: 130px;" readonly></div>
+                            <div>اسم الطبيب / <input type="text" id="rxDoctor" class="dotted-input"
+                                    style="width: 200px;"></div>
+                            <div>التوقيع / <input type="text" class="dotted-input" style="width: 130px;"></div>
+                        </div>
+
+                        <div style="margin-bottom: 6px;">
+                            السيد / الدكتور مدير صيدلية <input type="text" class="dotted-input" style="width: 75%;">
+                        </div>
+
+                        <div style="text-align: center; margin: 4px 0;">تحية طيبة وبعد ،،،</div>
+
+                        <div style="margin-bottom: 6px;">
+                            برجاء التنبيه بصرف الأدوية المبينة بعاليه للسيد / مندوب الادارة وسيتم سداد ربع قيمتها بمعرفة
+                            المندوب فى اليوم التالى للصرف .
+                        </div>
+
+                        <div class="footer-row">
+                            <div style="flex: 1.5;">اسم المريض : <input type="text"
+                                    class="dotted-input patient-name-input" style="width: 70%;"></div>
+                            <div style="flex: 1;">التوقيع بالعلم : <input type="text" class="dotted-input"
+                                    style="width: 50%;"></div>
+                            <div style="flex: 1;">رقم البطاقة : <input type="text" id="rxCardDisplay"
+                                    class="dotted-input" style="width: 50%;" readonly></div>
+                        </div>
+
+                        <div style="margin-top: 15px; text-align: center;" class="no-print">
+                            <button class="btn btn-primary" onclick="savePrescriptionToPatient()">حفظ هذه الروشتة في ملف
+                                المريض</button>
+
+                        </div>
+
+                        <div class="notes-section">
+                            <p><b>ملاحظات :</b></p>
+                            <p>(١) لا يجوز صرف الأدوية إلا إذا كان الأورنيك معتمداً ومختوماً بخاتم إدارة الرعاية الطبية.
+                            </p>
+                            <p>(٢) يستوفى بيان قيمة الأدوية بمعرفة الصيدلية ويراعى تحديد قيمتها وتسليم المندوب صورة
+                                الأورنيك.</p>
+                            <p>(٣) يراعى صرف الأدوية المقررة وفى حالة عدم وجودها ووجود بديل يرجع للطبيب المعالج لتقريره.
+                            </p>
+                        </div>
+
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 15px;">
+                            <div>طبيب / <input type="text" class="dotted-input" style="width: 150px;"></div>
+                            <div style="text-align: center; font-weight: bold;">
+                                <div>يعتمد -</div>
+                                <div class="signature-title" style="margin-top: 5px; font-size: 16px;">مدير الرعاية
+                                    الطبية</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تبويب طلب الأشعة والتحاليل -->
+            <div id="lab-tab" class="tab-content">
+                <div id="labPrintArea" class="lab-paper-container">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;" class="no-print">
+                        <button class="btn btn-warning" onclick="switchTab('patient-profile-tab')">🔙 العودة لصفحة
+                            المريض</button>
+                    </div>
+                    <div class="lab-header-section">
+                        <div class="lab-header-right">
+                            <div>وزارة الإسكان والمرافق والمجتمعات العمرانية</div>
+                            <div>هيئة المجتمعات العمرانية الجديدة</div>
+                            <div>جهاز تنمية مدينة العبور</div>
+                            <div class="dept-name">الإدارة الطبية</div>
+                        </div>
+                        <div class="lab-header-left">
+                            <div class="logo-placeholder"></div>
+                            <div class="alert-box">
+                                المطلوب : تحصيل ٢٥ ٪ من الأتعاب المبينة<br>أدناه قبل إجراء الفحص الطبى
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width: 70%; margin-right: 40px;">
+                        <div class="lab-form-row">
+                            <label>السيد الدكتور :</label>
+                            <input type="text" class="lab-dotted-input">
+                        </div>
+                        <div class="lab-form-row">
+                            <label>أخصائــــــى :</label>
+                            <input type="text" class="lab-dotted-input">
+                        </div>
+                        <div class="lab-form-row">
+                            <label>العنـــــــوان :</label>
+                            <input type="text" class="lab-dotted-input">
+                        </div>
+                    </div>
+
+                    <div class="lab-greeting">تحية طيبة وبعد ،،</div>
+
+                    <div class="lab-paragraph-text">
+                        <div class="lab-form-row no-print">
+                            <label>أدخل الرقم الطبي لجلب البيانات:</label>
+                            <input type="text" id="labCardSearch" class="lab-dotted-input"
+                                oninput="fetchPatientByNationalId(this.value, 'lab')">
+                        </div>
+
+                        <div class="lab-form-row">
+                            <label>المرجو التفضل بعمل الأشعات / التحاليل المبينة فيما يلى للسيد /</label>
+                            <input type="text" class="lab-dotted-input patient-name-input">
+                        </div>
+                        <div class="lab-form-row">
+                            <label>الشاغل لوظيفة :</label>
+                            <input type="text" id="labJob" class="lab-dotted-input" style="flex: 1;">
+                            <label style="margin-right: 20px;">من العاملين بجهة :</label>
+                            <input type="text" id="labSystem" class="lab-dotted-input" style="flex: 1.5;">
+                        </div>
+                        <div>بالوزارة وذلك طبقاً للاتفاق المبرم مع سيادتكم ووفقاً لقائمة أتعاب أسعار المؤسسة العلاجية
+                            وهى :</div>
+                    </div>
+
+                    <div class="lab-list-toolbar no-print">
+                            <span class="lab-list-toolbar-title">اختر الأشعة أو التحليل</span>
+                            <button type="button" class="lab-add-item-btn" onclick="addCustomLabOrRadiology()">＋ إضافة أشعة / تحليل</button>
+                        </div>
+
+                        <div class="lab-list-section">
+                        <div class="lab-list-headers">
+                            <span class="desc-header">البيــــــــان</span>
+                            <span class="val-header">القيمـــة</span>
+                        </div>
+                        <div class="lab-list-item"><span class="lab-dash">-</span><input type="text"
+                                class="lab-dotted-input lab-desc-input lab-search-input"><input type="text"
+                                class="lab-dotted-input lab-val-input"></div>
+                        <div class="lab-list-item"><span class="lab-dash">-</span><input type="text"
+                                class="lab-dotted-input lab-desc-input lab-search-input"><input type="text"
+                                class="lab-dotted-input lab-val-input"></div>
+                        <div class="lab-list-item"><span class="lab-dash">-</span><input type="text"
+                                class="lab-dotted-input lab-desc-input lab-search-input"><input type="text"
+                                class="lab-dotted-input lab-val-input"></div>
+                        <div class="lab-list-item"><span class="lab-dash">-</span><input type="text"
+                                class="lab-dotted-input lab-desc-input lab-search-input"><input type="text"
+                                class="lab-dotted-input lab-val-input"></div>
+                        <div class="lab-list-item"><span class="lab-dash">-</span><input type="text"
+                                class="lab-dotted-input lab-desc-input lab-search-input"><input type="text"
+                                class="lab-dotted-input lab-val-input"></div>
+                    </div>
+
+                    <div class="lab-footer-notes">
+                        <div>مع مراعاة تحصيل نسبة ٢٥٪ من قيمة الأتعاب عاليه بمعرفتكم من العامل نقداً قبل إجراء الفحص
+                            المطلوب</div>
+                        <div>والجهاز يخلي مسئوليته فى حالة عدم سداد المريض للأتعاب المقررة .</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap;"
+                        class="no-print">
+                        <button class="btn btn-primary" onclick="saveCurrentPatientProfile()">حفظ الطلب في ملف
+                            المريض</button>
+                        <button class="btn btn-warning" onclick="printLabSheet()">طباعة</button>
+                    </div>
+
+                    <div class="lab-respect-text">وتفضلوا بقبول فائق الإحترام ،،</div>
+                    <div class="lab-signature">مدير الإدارة الطبية</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- المشروع -->
+<script src="script/script.js"></script>
+
+    <div id="login-overlay" class="login-overlay" aria-modal="true" role="dialog">
+        <div class="login-card">
+            <div class="login-logo">🏥</div>
+            <h2>تسجيل الدخول</h2>
+            <p>أدخل رقم الدخول للمتابعة</p>
+            <form id="login-form" autocomplete="off">
+                <label for="login-code">رقم الدخول</label>
+                <div class="login-field-wrap">
+                    <input id="login-code" class="login-input" type="text" inputmode="numeric" autocomplete="off"
+                           maxlength="12" placeholder=" رقم الدخول" aria-label="رقم الدخول">
+                    <button type="button" id="toggle-login-code" class="login-toggle" aria-label="إظهار أو إخفاء الرقم">👁</button>
+                </div>
+                <div id="login-error" class="login-error" role="alert"></div>
+                <button type="submit" class="btn btn-primary login-submit">دخول</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>
